@@ -15,10 +15,6 @@ function Vector (x, y) {
   this.y = y;
 }
 
-Vector.prototype.add = function (v2) {
-  return new Vector(this.x + v2.x, this.y + v2.y);
-}
-
 Vector.prototype.clampX = function (min, max) {
   var x = this.x;
   if (x > max) x = max;
@@ -33,13 +29,38 @@ Vector.prototype.clampY = function (min, max) {
   return new Vector(this.x, y);
 }
 
+Vector.prototype.add = function (v2) {
+  return new Vector(this.x + v2.x, this.y + v2.y);
+}
+
+Vector.prototype.length = function () {
+  return Math.sqrt(this.x * this.x + this.y * this.y);
+};
+
+Vector.prototype.distance = function (v2) {
+  return this.subtract(v2).length();
+};
+
 Vector.prototype.subtract = function (v2) {
   return new Vector(this.x - v2.x, this.y - v2.y);
-}
+};
 
 Vector.prototype.mult = function (scalar) {
   return new Vector(this.x * scalar, this.y * scalar);
-}
+};
+
+// set vector's length to 1
+Vector.prototype.normalize = function () {
+  var len = this.length();
+  var x = this.x / len;
+  var y = this.y / len;
+  return new Vector(x, y);
+};
+
+Vector.prototype.dotProduct = function (v2) {
+  return this.x * v2.x + this.y * v2.y;
+};
+
 
 // MATH HELPERS
 
@@ -167,8 +188,7 @@ Game.prototype.step = function (deltaMs) {
       player.acc = player.acc.mult(0);
     }
     // Apply acceleration to velocity
-    // TODO: clamp to player max speed instead of -1, 1
-    player.vel = player.vel.add(player.acc).clampX(-1, 1).clampY(-1, 1);
+    player.vel = player.vel.add(player.acc);
     // Add velocity to position
     player.pos = player.pos.add(player.vel);
     // Clamp position to level boundary
