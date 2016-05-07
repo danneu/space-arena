@@ -33,8 +33,15 @@ Vector.prototype.add = function (v2) {
   return new Vector(this.x + v2.x, this.y + v2.y);
 }
 
+// i.e. the hypotenuse of the vector
+// a ship's speed = ship.vel.length();
 Vector.prototype.length = function () {
   return Math.sqrt(this.x * this.x + this.y * this.y);
+};
+
+// https://en.wikipedia.org/wiki/Normal_(geometry)
+Vector.prototype.perp = function () {
+  return new Vector(-this.y, this.x);
 };
 
 Vector.prototype.distance = function (v2) {
@@ -61,6 +68,16 @@ Vector.prototype.dotProduct = function (v2) {
   return this.x * v2.x + this.y * v2.y;
 };
 
+// TODO : Handle V(0, 0);
+Vector.prototype.deg = function () {
+  var ang = radToDeg(Math.atan(-this.y / -this.x));
+  if (this.x == 0) {
+    if (this.y > 0) return 180;
+    else return 0;
+  }
+  if (this.x > 0) return 90 + ang;
+  if (this.x < 0) return 270 + ang;
+};
 
 // MATH HELPERS
 
@@ -97,6 +114,7 @@ function bottom (e) { return e.pos.y + e.h; };
 
 function Player (id, initX, initY) {
   this.id = id;
+  // VECTORS
   this.pos = new Vector(initX || 0, initY || 0);
   this.vel = new Vector(1, 0);
   this.acc = new Vector(0, 0);
@@ -106,8 +124,10 @@ function Player (id, initX, initY) {
   this.keys = {
     UP: false, DOWN: false, LEFT: false, RIGHT: false
   };
+  this.acceleration = 0.20;
   this.speed = 5;
-  this.turnSpeed = 200; // degs of turn per second
+  this.turnSpeed = 200; // degs per second
+  this.maxSpeed = 2;
   this.color = '#'+(Math.random()*0xFFFFFF<<0).toString(16);
   // SHOOTING
   this.lastShot = new Date(0);
@@ -120,8 +140,8 @@ function Player (id, initX, initY) {
 // merges server state broadcasts into its game instance.
 function Game (data) {
   data = data || {};
-  this.w = this.width = data.width || 600 || 300;
-  this.h = this.height = data.height || 300 || 200;
+  this.w = this.width = data.width || 1200 || 600 || 300;
+  this.h = this.height = data.height || 600 || 300 || 200;
   this.players = data.players || Object.create(null);
   // each player's velocity is multiplied by the friction scalar
   // in every frame.
@@ -160,6 +180,11 @@ function adjust (deltaMs, val) {
   return val * deltaMs / 1000;
 }
 
+function degToVector (deg) {
+  var rad = degToRad(deg);
+  return new Vector(Math.sin(rad), -Math.cos(rad));
+}
+
 // Simulate a game tick.
 Game.prototype.step = function (deltaMs) {
   // Move players
@@ -173,15 +198,9 @@ Game.prototype.step = function (deltaMs) {
     }
     // Handle acceleration input
     if (player.keys.UP || player.keys.DOWN) {
-      var rads = degToRad(player.angle);
-      var ax = Math.sin(rads);
-      var ay = -Math.cos(rads);
-      var newVector;
-      if (player.keys.UP) 
-        newVector = new Vector(ax, ay);
-      else if (player.keys.DOWN) 
-        newVector = new Vector(-ax, -ay);
-      console.log('newVector:', newVector);
+      var newVector = degToVector(player.angle);
+      if (player.keys.DOWN) newVector = newVector.mult(-1);
+      newVector = newVector.mult(player.acceleration);
       player.acc = newVector;
     } else {
       // no keys pressed = no acceleration
@@ -192,6 +211,7 @@ Game.prototype.step = function (deltaMs) {
     // Add velocity to position
     player.pos = player.pos.add(player.vel);
     // Clamp position to level boundary
+    // TODO: Replace with a bounds check that also resets velocity
     player.pos = player.pos.clampX(0, this.w).clampY(0, this.h);
     // Apply air friction to ship
     player.vel = player.vel.mult(this.airFriction);
