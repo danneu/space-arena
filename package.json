@@ -1,0 +1,17 @@
+{
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/danneu/space-arena"
+  },
+  "scripts": {
+    "start": "node ./server.js"
+  },
+  "engines": {
+    "node": "6.x"
+  },
+  "dependencies": {
+    "express": "^4.13.4",
+    "socket.io": "^1.4.6"
+  },
+  "license": "MIT"
+}
