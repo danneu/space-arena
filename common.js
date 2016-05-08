@@ -125,7 +125,7 @@ function Player (id, initX, initY) {
     UP: false, DOWN: false, LEFT: false, RIGHT: false
   };
   this.acceleration = 0.05;
-  this.speed = 3;
+  this.maxSpeed = 3;
   this.turnSpeed = 200; // degs per second
   this.color = '#'+(Math.random()*0xFFFFFF<<0).toString(16);
   // SHOOTING
@@ -138,7 +138,7 @@ function Player (id, initX, initY) {
 // The server and client run their own game instance. The client
 // merges server state broadcasts into its game instance.
 function Game (data) {
-  data = data || {};
+  data = data || Object.create(null);
   this.w = this.width = data.width || 1200 || 600 || 300;
   this.h = this.height = data.height || 600 || 300 || 200;
   this.players = data.players || Object.create(null);
@@ -146,8 +146,8 @@ function Game (data) {
   // in every frame.
   this.airFriction = 0.995;
   // loops
-  this.physicsInterval = data.physicsInterval || 15;
-  this.broadcastInterval = data.broadCastInterval || 45;
+  this.physicsInterval = data.physicsInterval || 15; // 66 times per sec
+  this.broadcastInterval = data.broadCastInterval || 45; // 22 times per sec
 }
 
 Game.prototype.mergeState = function (newState) {
@@ -174,9 +174,10 @@ Game.prototype.removePlayer = function (id) {
 //
 // this function adjusts the value against the fraction of
 // the second since the last physics loop.
-function adjust (deltaMs, val) {
-  //return Math.round(val * deltaMs / 1000);
-  return val * deltaMs / 1000;
+function makeAdjust (deltaMs) {
+  return function adjust (val) {
+    return val * deltaMs / 1000;
+  }
 }
 
 function degToVector (deg) {
@@ -186,12 +187,13 @@ function degToVector (deg) {
 
 // Simulate a game tick.
 Game.prototype.step = function (deltaMs) {
+  var adjust = makeAdjust(deltaMs);
   // Move players
   for (var id in this.players) {
     var player = this.players[id];
     // Handle turning input
     if (player.keys.LEFT || player.keys.RIGHT) {
-      var deltaAngle = adjust(deltaMs, player.turnSpeed);
+      var deltaAngle = adjust(player.turnSpeed);
       if (player.keys.LEFT) player.angle = mod(player.angle - deltaAngle, 360);
       if (player.keys.RIGHT) player.angle = mod(player.angle + deltaAngle, 360);
     }
@@ -208,8 +210,8 @@ Game.prototype.step = function (deltaMs) {
     // Apply acceleration to velocity
     player.vel = player.vel.add(player.acc);
     // Enforce max speed
-    if (player.vel.length() > player.speed) {
-      player.vel = player.vel.mult(player.speed / player.vel.length());
+    if (player.vel.length() > player.maxSpeed) {
+      player.vel = player.vel.mult(player.maxSpeed / player.vel.length());
     }
     // Add velocity to position
     player.pos = player.pos.add(player.vel);
