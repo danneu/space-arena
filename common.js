@@ -112,26 +112,39 @@ function right (e) { return e.pos.x + e.w; };
 function top (e) { return e.pos.y; };
 function bottom (e) { return e.pos.y + e.h; };
 
-function Player (id, initX, initY) {
-  this.id = id;
+function Player (data) {
+  data = data || {};
+  data.pos = data.pos || {};
+  data.vel = data.vel || {};
+  data.acc = data.acc || {};
+  this.id = data.id || uid();
   // VECTORS
-  this.pos = new Vector(initX || 0, initY || 0);
-  this.vel = new Vector(1, 0);
-  this.acc = new Vector(0, 0);
-  this.angle = 45;
-  this.w = 64;
-  this.h = 64;
+  this.pos = new Vector(data.pos.x || 100, data.pos.y || 100);
+  this.vel = new Vector(data.vel.x || 1, data.vel.y || 0);
+  this.acc = new Vector(data.acc.x || 0, data.acc.y || 0);
+  this.angle = data.angle || 45;
+  this.w = data.w || 64;
+  this.h = data.h || 64;
   this.keys = {
     UP: false, DOWN: false, LEFT: false, RIGHT: false
   };
   this.acceleration = 0.05;
   this.maxSpeed = 3;
   this.turnSpeed = 200; // degs per second
-  this.color = '#'+(Math.random()*0xFFFFFF<<0).toString(16);
+  this.color = data.color || '#'+(Math.random()*0xFFFFFF<<0).toString(16);
   // SHOOTING
   this.lastShot = new Date(0);
   this.shotCooldown = 500; // ms
 }
+
+// merge in state broadcast from the server
+Player.prototype.merge = function (state) {
+  this.pos = new Vector(state.pos.x, state.pos.y);
+  this.vel = new Vector(state.vel.x, state.vel.y);
+  this.acc = new Vector(state.acc.x, state.acc.y);
+  this.angle = state.angle;
+  this.keys = state.keys;
+};
 
 ////////////////////////////////////////////////////////////
 

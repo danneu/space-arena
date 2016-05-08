@@ -22,11 +22,8 @@ io.on('connect', onClientConnect);
 
 function onClientConnect (socket) {
   console.log('player connected');
-  socket.on('PING', onClientPing);
   socket.on('disconnect', onClientDisconnect);
   socket.on('HANDSHAKE', onClientHandshake);
-  socket.on('KEYDOWN', onClientKeydown);
-  socket.on('KEYUP', onClientKeyup);
 }
 
 function onClientDisconnect () {
@@ -38,11 +35,14 @@ function onClientDisconnect () {
 
 function onClientHandshake (cb) {
   console.log('client handshake');
-  const player = new Player(this.id, 100, 100);
+  const player = new Player({ id: this.id });
   localGame.addPlayer(player);
   this.emit('PLAYER_JOIN', player);
   this.emit('GAME_STATE', localGame);
   cb(player.id);
+  this.on('PING', onClientPing);
+  this.on('KEYDOWN', onClientKeydown);
+  this.on('KEYUP', onClientKeyup);
 }
 
 var KEY_WHITELIST = {

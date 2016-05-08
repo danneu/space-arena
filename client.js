@@ -21,6 +21,11 @@ document.body.appendChild(renderer.view);
 var stage = new PIXI.Container();
 var shipTexture = PIXI.Texture.fromImage('/img/ship.gif');
 stage.addChild(new PIXI.extras.TilingSprite(PIXI.Texture.fromImage('/img/starfield.jpg'), renderer.width, renderer.height));
+var info = new PIXI.Text('test', {
+  font: '18px monospace',
+  fill: 0xffffff
+});
+stage.addChild(info);
 
 // our own mapping of playerIds to their underlying PIXI Sprite instance
 // gets updated as players join/leave
@@ -46,8 +51,21 @@ function removePlayerSprite (player) {
 
 ////////////////////////////////////////////////////////////
 
+function getInfoText () {
+  if (!localPlayerId) return '';
+  var player = localGame.players[localPlayerId];
+  var out = '';
+  out += ' speed: ' + player.vel.length().toFixed(2);
+  out += '\n accel: (' + player.acc.x.toFixed(2) + ', ' + player.acc.y.toFixed(2) + ')';
+  out += '\n veloc: (' + player.vel.x.toFixed(2) + ', ' + player.vel.y.toFixed(2) + ')';
+  out += '\n facing: ' + Math.floor(player.angle) + '°';
+  out += '\n moving: ' + Math.floor(player.vel.deg()) + '°';
+  return out;
+}
+
 function animate () {
   requestAnimationFrame(animate);
+  info.text = getInfoText();
   renderer.render(stage);
 }
 animate();
@@ -76,7 +94,15 @@ function onPlayerLeave (player) {
 }
 
 function onGameState (state) {
-  localGame.mergeState(state);
+  // OFF: localGame.mergeState(state);
+
+  // merge in player state from server or create them locally
+  for (var id in state.players) {
+    if (localGame.players[id])
+      localGame.players[id].merge(state.players[id]);
+    else
+      localGame.players[id] = new Player(state.players[id]);
+  }
   // update each sprite
   for (var id in localGame.players) {
     if (sprites[id]) {
