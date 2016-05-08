@@ -56,6 +56,10 @@ Vector.prototype.mult = function (scalar) {
   return new Vector(this.x * scalar, this.y * scalar);
 };
 
+Vector.prototype.divide = function (scalar) {
+  return new Vector(this.x / scalar, this.y / scalar);
+};
+
 // set vector's length to 1
 Vector.prototype.normalize = function () {
   var len = this.length();
