@@ -20,6 +20,7 @@ document.body.appendChild(renderer.view);
 
 var stage = new PIXI.Container();
 var shipTexture = PIXI.Texture.fromImage('/img/ship.gif');
+stage.addChild(new PIXI.extras.TilingSprite(PIXI.Texture.fromImage('/img/starfield.jpg'), renderer.width, renderer.height));
 
 // our own mapping of playerIds to their underlying PIXI Sprite instance
 // gets updated as players join/leave
