@@ -124,10 +124,9 @@ function Player (id, initX, initY) {
   this.keys = {
     UP: false, DOWN: false, LEFT: false, RIGHT: false
   };
-  this.acceleration = 0.20;
-  this.speed = 5;
+  this.acceleration = 0.05;
+  this.speed = 3;
   this.turnSpeed = 200; // degs per second
-  this.maxSpeed = 2;
   this.color = '#'+(Math.random()*0xFFFFFF<<0).toString(16);
   // SHOOTING
   this.lastShot = new Date(0);
@@ -208,6 +207,10 @@ Game.prototype.step = function (deltaMs) {
     }
     // Apply acceleration to velocity
     player.vel = player.vel.add(player.acc);
+    // Enforce max speed
+    if (player.vel.length() > player.speed) {
+      player.vel = player.vel.mult(player.speed / player.vel.length());
+    }
     // Add velocity to position
     player.pos = player.pos.add(player.vel);
     // Clamp position to level boundary
