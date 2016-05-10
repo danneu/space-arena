@@ -4,7 +4,8 @@
     "url": "https://github.com/danneu/space-arena"
   },
   "scripts": {
-    "start": "node ./server.js"
+    "start": "node ./server.js",
+    "start-dev": "nodemon ./server.js"
   },
   "engines": {
     "node": "6.x"
