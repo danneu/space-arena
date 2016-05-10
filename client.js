@@ -12,9 +12,11 @@ if (window.location.hostname === 'localhost') {
 var localGame = new Game();
 var localPlayerId;
 
+var viewport = { w: window.innerWidth, h: window.innerHeight };
+
 // SETUP PIXI
 
-var renderer = PIXI.autoDetectRenderer(localGame.w, localGame.h);
+var renderer = PIXI.autoDetectRenderer(viewport.w, viewport.h);
 console.log('renderer:', renderer);
 document.body.appendChild(renderer.view);
 
@@ -23,7 +25,7 @@ var shipTexture = PIXI.Texture.fromImage('/img/ship.gif');
 var bombTexture = PIXI.Texture.fromImage('/img/bomb.png');
 var starfieldSprite = new PIXI.extras.TilingSprite(PIXI.Texture.fromImage('/img/starfield.jpg'), renderer.width, renderer.height);
 stage.addChild(starfieldSprite);
-var info = new PIXI.Text('test', {
+var info = new PIXI.Text('loading...', {
   font: '18px monospace',
   fill: 0xffffff
 });
@@ -82,10 +84,18 @@ function getInfoText () {
 
 function animate () {
   requestAnimationFrame(animate);
-  info.text = getInfoText();
   if (localPlayerId) {
+    var localPlayer = localGame.players[localPlayerId];
+    // info text
+    info.text = getInfoText();
+    info.position.x = localPlayer.pos.x - viewport.w/2;
+    info.position.y = localPlayer.pos.y - viewport.h/2;
+    // parallel
     starfieldSprite.tilePosition.x += -localGame.players[localPlayerId].vel.x;
     starfieldSprite.tilePosition.y += -localGame.players[localPlayerId].vel.y;
+    // center cam
+    stage.position.x = viewport.w/2 - localPlayer.pos.x;
+    stage.position.y = viewport.h/2 - localPlayer.pos.y;
   }
   renderer.render(stage);
 }

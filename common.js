@@ -207,8 +207,8 @@ Player.prototype.nose = function () {
 // merges server state broadcasts into its game instance.
 function Game (data) {
   data = data || Object.create(null);
-  this.w = this.width = data.width || 1200 || 600 || 300;
-  this.h = this.height = data.height || 600 || 300 || 200;
+  this.w = this.width = data.width || 10000 || 1200 || 600 || 300;
+  this.h = this.height = data.height || 10000 || 600 || 300 || 200;
   this.players = data.players || Object.create(null);
   this.bombs = data.bombs || Object.create(null);
   // each player's velocity is multiplied by the friction scalar
