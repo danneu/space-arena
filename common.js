@@ -150,6 +150,12 @@ Player.prototype.merge = function (state) {
   this.keys = state.keys;
 };
 
+
+// i.e. length of the player's velocity vector
+Player.prototype.speed = function () {
+  return this.vel.length();
+};
+
 ////////////////////////////////////////////////////////////
 
 // The server and client run their own game instance. The client
@@ -236,7 +242,9 @@ Game.prototype.step = function (deltaMs) {
     // TODO: Replace with a bounds check that also resets velocity
     player.pos = player.pos.clampX(0, this.w).clampY(0, this.h);
     // Apply air friction to ship
-    player.vel = player.vel.mult(this.airFriction);
+    if (player.speed() > 0.10) {
+      player.vel = player.vel.mult(this.airFriction);
+    }
   }
 };
 
