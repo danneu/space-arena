@@ -21,7 +21,8 @@ document.body.appendChild(renderer.view);
 var stage = new PIXI.Container();
 var shipTexture = PIXI.Texture.fromImage('/img/ship.gif');
 var bombTexture = PIXI.Texture.fromImage('/img/bomb.png');
-stage.addChild(new PIXI.extras.TilingSprite(PIXI.Texture.fromImage('/img/starfield.jpg'), renderer.width, renderer.height));
+var starfieldSprite = new PIXI.extras.TilingSprite(PIXI.Texture.fromImage('/img/starfield.jpg'), renderer.width, renderer.height);
+stage.addChild(starfieldSprite);
 var info = new PIXI.Text('test', {
   font: '18px monospace',
   fill: 0xffffff
@@ -82,6 +83,10 @@ function getInfoText () {
 function animate () {
   requestAnimationFrame(animate);
   info.text = getInfoText();
+  if (localPlayerId) {
+    starfieldSprite.tilePosition.x += -localGame.players[localPlayerId].vel.x;
+    starfieldSprite.tilePosition.y += -localGame.players[localPlayerId].vel.y;
+  }
   renderer.render(stage);
 }
 animate();
