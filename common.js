@@ -150,6 +150,13 @@ Player.prototype.merge = function (state) {
   this.keys = state.keys;
 };
 
+// returns (x, y) position vector
+Player.prototype.nose = function () {
+  var r = this.w / 2;
+  var noseX = this.pos.x + r * Math.cos(degToRad(this.angle));
+  var noseY = this.pos.y + r * Math.sin(degToRad(this.angle));
+  return new Vector(noseX, noseY);
+};
 
 // i.e. length of the player's velocity vector
 Player.prototype.speed = function () {

@@ -56,6 +56,7 @@ function getInfoText () {
   var player = localGame.players[localPlayerId];
   var out = '';
   out += ' speed: ' + player.vel.length().toFixed(2);
+  out += '\n nose : (' + player.nose().x.toFixed(2) + ', ' + player.nose().y.toFixed(2) + ')';
   out += '\n posit: (' + player.pos.x.toFixed(2) + ', ' + player.pos.y.toFixed(2) + ')';
   out += '\n accel: (' + player.acc.x.toFixed(2) + ', ' + player.acc.y.toFixed(2) + ')';
   out += '\n veloc: (' + player.vel.x.toFixed(2) + ', ' + player.vel.y.toFixed(2) + ')';
