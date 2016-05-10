@@ -77,6 +77,6 @@ setInterval(function () {
   // just emit the essential data
   io.emit('GAME_STATE', {
     players: localGame.players,
-    bullets: localGame.bullets
+    bombs: localGame.bombs
   });
 }, localGame.broadcastInterval);

@@ -20,6 +20,7 @@ document.body.appendChild(renderer.view);
 
 var stage = new PIXI.Container();
 var shipTexture = PIXI.Texture.fromImage('/img/ship.gif');
+var bombTexture = PIXI.Texture.fromImage('/img/bomb.png');
 stage.addChild(new PIXI.extras.TilingSprite(PIXI.Texture.fromImage('/img/starfield.jpg'), renderer.width, renderer.height));
 var info = new PIXI.Text('test', {
   font: '18px monospace',
@@ -43,10 +44,23 @@ function addPlayerSprite (player) {
   sprites[player.id] = sprite;
   stage.addChild(sprite);
 }
+function addBombSprite (state) {
+  var sprite = new PIXI.Sprite(bombTexture);
+  sprite.anchor.x = 0.5;
+  sprite.anchor.y = 0.5;
+  sprite.position.x = state.pos.x;
+  sprite.position.y = state.pos.y;
+  sprites[state.id] = sprite;
+  stage.addChild(sprite);
+}
 
 function removePlayerSprite (player) {
   stage.addChild(sprites[player.id]);
   delete sprites[player.id];
+}
+function removeBombSprite (state) {
+  stage.addChild(sprites[state.id]);
+  delete sprites[state.id];
 }
 
 ////////////////////////////////////////////////////////////
@@ -105,7 +119,14 @@ function onGameState (state) {
     else
       localGame.players[id] = new Player(state.players[id]);
   }
-  // update each sprite
+  // merge in bomb state from server or create them locally
+  for (var id in state.bombs) {
+    if (localGame.bombs[id])
+      localGame.bombs[id].merge(state.bombs[id]);
+    else
+      localGame.bombs[id] = new Bomb(state.bombs[id]);
+  }
+  // update each player sprite
   for (var id in localGame.players) {
     if (sprites[id]) {
       sprites[id].rotation = degToRad(localGame.players[id].angle);
@@ -113,6 +134,15 @@ function onGameState (state) {
       sprites[id].position.y = localGame.players[id].pos.y;
     } else {
       addPlayerSprite(localGame.players[id]);
+    }
+  }
+  // update each bomb sprite
+  for (var id in localGame.bombs) {
+    if (sprites[id]) {
+      sprites[id].position.x = localGame.bombs[id].pos.x;
+      sprites[id].position.y = localGame.bombs[id].pos.y;
+    } else {
+      addBombSprite(localGame.bombs[id]);
     }
   }
 }

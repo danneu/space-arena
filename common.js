@@ -116,11 +116,52 @@ function right (e) { return e.pos.x + e.w; };
 function top (e) { return e.pos.y; };
 function bottom (e) { return e.pos.y + e.h; };
 
+function Entity (data) {
+  data = data = {};
+  data.pos = data.pos || {};
+  data.vel = data.vel || {};
+  this.id = data.id || uid();
+  // VECTORS
+  this.pos = new Vector(data.pos.x || 100, data.pos.y || 100);
+  this.vel = new Vector(data.vel.x || 1, data.vel.y || 0);
+  this.w = data.w || 16;
+  this.h = data.h || 16;
+}
+
+
+// i.e. length of the entity's velocity vector
+Entity.prototype.speed = function () {
+  return this.vel.length();
+};
+
+Player.prototype = new Entity();
+Bomb.prototype = new Entity();
+
+function Bomb (data) {
+  data.pos = data.pos || {};
+  data.vel = data.vel || {};
+  Entity.call(this, data);
+  this.id = data.id || uid();
+  this.playerId = data.playerId;
+  // VECTORS
+  this.pos = new Vector(data.pos.x || 100, data.pos.y || 100);
+  this.vel = new Vector(data.vel.x || 1, data.vel.y || 0);
+}
+
+// merge in state broadcast from the server
+// only the stuff that changes between frames
+Bomb.prototype.merge = function (state) {
+  this.pos = new Vector(state.pos.x, state.pos.y);
+  this.vel = new Vector(state.vel.x, state.vel.y);
+};
+
+
 function Player (data) {
   data = data || {};
   data.pos = data.pos || {};
   data.vel = data.vel || {};
   data.acc = data.acc || {};
+  Entity.call(this, data);
   this.id = data.id || uid();
   // VECTORS
   this.pos = new Vector(data.pos.x || 100, data.pos.y || 100);
@@ -136,12 +177,14 @@ function Player (data) {
   this.maxSpeed = 3;
   this.turnSpeed = 200; // degs per second
   this.color = data.color || '#'+(Math.random()*0xFFFFFF<<0).toString(16);
-  // SHOOTING
-  this.lastShot = new Date(0);
-  this.shotCooldown = 500; // ms
+  // BOMBS
+  this.lastBomb = new Date(0);
+  this.bombCooldown = 1000; // ms
+  this.bombBounces = 0; // bounces left. 0 = doesn't bounce.
 }
 
 // merge in state broadcast from the server
+// only the stuff that changes between frames
 Player.prototype.merge = function (state) {
   this.pos = new Vector(state.pos.x, state.pos.y);
   this.vel = new Vector(state.vel.x, state.vel.y);
@@ -153,14 +196,9 @@ Player.prototype.merge = function (state) {
 // returns (x, y) position vector
 Player.prototype.nose = function () {
   var r = this.w / 2;
-  var noseX = this.pos.x + r * Math.cos(degToRad(this.angle));
-  var noseY = this.pos.y + r * Math.sin(degToRad(this.angle));
+  var noseX = this.pos.x + r * Math.cos(degToRad(this.angle - 90));
+  var noseY = this.pos.y + r * Math.sin(degToRad(this.angle - 90));
   return new Vector(noseX, noseY);
-};
-
-// i.e. length of the player's velocity vector
-Player.prototype.speed = function () {
-  return this.vel.length();
 };
 
 ////////////////////////////////////////////////////////////
@@ -172,6 +210,7 @@ function Game (data) {
   this.w = this.width = data.width || 1200 || 600 || 300;
   this.h = this.height = data.height || 600 || 300 || 200;
   this.players = data.players || Object.create(null);
+  this.bombs = data.bombs || Object.create(null);
   // each player's velocity is multiplied by the friction scalar
   // in every frame.
   this.airFriction = 0.995;
@@ -231,7 +270,7 @@ Game.prototype.step = function (deltaMs) {
     if (player.keys.UP || player.keys.DOWN) {
       var newVector = degToVector(player.angle);
       if (player.keys.DOWN) newVector = newVector.mult(-1);
-      newVector = newVector.mult(player.acceleration);
+     newVector = newVector.mult(player.acceleration);
       player.acc = newVector;
     } else {
       // no keys pressed = no acceleration
@@ -252,6 +291,28 @@ Game.prototype.step = function (deltaMs) {
     if (player.speed() > 0.10) {
       player.vel = player.vel.mult(this.airFriction);
     }
+    // END: MOVE
+    // START: HANDLE BULLET INPUT
+    if (player.keys.S && new Date() - player.lastBomb >= player.bombCooldown) {
+      var bomb = new Bomb({
+        playerId: player.id,
+        pos: player.nose(),
+        //vel: player.vel
+        vel: degToVector(player.angle).mult(3).add(player.vel.mult(0.5))
+      });
+      this.bombs[bomb.id] = bomb;
+      // reset bomb cooldown
+      player.lastBomb = new Date();
+    }
+  }
+  // MOVE EACH BOMB
+  for (var id in this.bombs) {
+    var bomb = this.bombs[id];
+    // Add velocity to position
+    bomb.pos = bomb.pos.add(bomb.vel);
+    // Clamp position to level boundary
+    // TODO: Replace with a bounds check that also resets velocity
+    bomb.pos = bomb.pos.clampX(0, this.w).clampY(0, this.h);
   }
 };
 
