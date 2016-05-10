@@ -12,24 +12,29 @@ if (window.location.hostname === 'localhost') {
 var localGame = new Game();
 var localPlayerId;
 
-var viewport = { w: window.innerWidth, h: window.innerHeight };
+var windowDims = { w: window.innerWidth, h: window.innerHeight };
+
 
 // SETUP PIXI
 
-var renderer = PIXI.autoDetectRenderer(viewport.w, viewport.h);
+var viewport = new PIXI.Container();
+
+var renderer = PIXI.autoDetectRenderer(windowDims.w, windowDims.h);
 console.log('renderer:', renderer);
 document.body.appendChild(renderer.view);
 
-var stage = new PIXI.Container();
+var world = new PIXI.Container();
 var shipTexture = PIXI.Texture.fromImage('/img/ship.gif');
 var bombTexture = PIXI.Texture.fromImage('/img/bomb.png');
 var starfieldSprite = new PIXI.extras.TilingSprite(PIXI.Texture.fromImage('/img/starfield.jpg'), renderer.width, renderer.height);
-stage.addChild(starfieldSprite);
 var info = new PIXI.Text('loading...', {
   font: '18px monospace',
   fill: 0xffffff
 });
-stage.addChild(info);
+
+viewport.addChild(starfieldSprite);
+viewport.addChild(info);
+viewport.addChild(world);
 
 // our own mapping of playerIds to their underlying PIXI Sprite instance
 // gets updated as players join/leave
@@ -45,7 +50,7 @@ function addPlayerSprite (player) {
   sprite.position.y = player.pos.y;
   sprite.rotation = degToRad(player.angle);
   sprites[player.id] = sprite;
-  stage.addChild(sprite);
+  world.addChild(sprite);
 }
 function addBombSprite (state) {
   var sprite = new PIXI.Sprite(bombTexture);
@@ -54,15 +59,15 @@ function addBombSprite (state) {
   sprite.position.x = state.pos.x;
   sprite.position.y = state.pos.y;
   sprites[state.id] = sprite;
-  stage.addChild(sprite);
+  world.addChild(sprite);
 }
 
 function removePlayerSprite (player) {
-  stage.addChild(sprites[player.id]);
+  world.removeChild(sprites[player.id]);
   delete sprites[player.id];
 }
 function removeBombSprite (state) {
-  stage.addChild(sprites[state.id]);
+  world.removeChild(sprites[state.id]);
   delete sprites[state.id];
 }
 
@@ -88,16 +93,14 @@ function animate () {
     var localPlayer = localGame.players[localPlayerId];
     // info text
     info.text = getInfoText();
-    info.position.x = localPlayer.pos.x - viewport.w/2;
-    info.position.y = localPlayer.pos.y - viewport.h/2;
     // parallel
     starfieldSprite.tilePosition.x += -localGame.players[localPlayerId].vel.x;
     starfieldSprite.tilePosition.y += -localGame.players[localPlayerId].vel.y;
     // center cam
-    stage.position.x = viewport.w/2 - localPlayer.pos.x;
-    stage.position.y = viewport.h/2 - localPlayer.pos.y;
+    world.position.x = windowDims.w/2 - localPlayer.pos.x;
+    world.position.y = windowDims.h/2 - localPlayer.pos.y;
   }
-  renderer.render(stage);
+  renderer.render(viewport);
 }
 animate();
 
