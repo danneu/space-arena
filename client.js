@@ -1,4 +1,10 @@
 
+var Game = require('./common/Game');
+var Player =require('./common/Player'); 
+var Vector = require('./common/Vector');
+var Bomb = require('./common/Bomb');
+var belt = require('./common/belt');
+
 // var SERVER_URL = 'https://hello-world-game.herokuapp.com/';
 var SERVER_URL;
 if (window.location.hostname === 'localhost') {
@@ -64,7 +70,7 @@ function addPlayerSprite (player) {
   sprite.anchor.y = 0.5;
   sprite.position.x = player.pos.x;
   sprite.position.y = player.pos.y;
-  sprite.rotation = degToRad(player.angle);
+  sprite.rotation = belt.degToRad(player.angle);
   sprites[player.id] = sprite;
   world.addChild(sprite);
 }
@@ -79,12 +85,19 @@ function addBombSprite (state) {
 }
 
 function removePlayerSprite (player) {
+  console.log('removing', player);
   world.removeChild(sprites[player.id]);
   delete sprites[player.id];
 }
 function removeBombSprite (state) {
   world.removeChild(sprites[state.id]);
   delete sprites[state.id];
+}
+
+// TODO: Use this..
+function removeSprite (id) {
+  world.removeChild(sprites[id]);
+  delete sprites[id];
 }
 
 ////////////////////////////////////////////////////////////
@@ -100,6 +113,8 @@ function getInfoText () {
   out += '\n veloc: (' + player.vel.x.toFixed(2) + ', ' + player.vel.y.toFixed(2) + ')';
   out += '\n facing: ' + Math.floor(player.angle) + '°';
   out += '\n moving: ' + Math.floor(player.vel.deg()) + '°';
+  out += '\n ----';
+  out += '\n energy: ' + player.currEnergy + '/' + player.totalEnergy;
   return out;
 }
 
@@ -144,26 +159,24 @@ function onPlayerLeave (player) {
 }
 
 function onGameState (state) {
-  // OFF: localGame.mergeState(state);
-
   // merge in player state from server or create them locally
   for (var id in state.players) {
     if (localGame.players[id])
-      localGame.players[id].merge(state.players[id]);
+      localGame.players[id].mergeM(state.players[id]);
     else
       localGame.players[id] = new Player(state.players[id]);
   }
   // merge in bomb state from server or create them locally
   for (var id in state.bombs) {
     if (localGame.bombs[id])
-      localGame.bombs[id].merge(state.bombs[id]);
+      localGame.bombs[id].mergeM(state.bombs[id]);
     else
       localGame.bombs[id] = new Bomb(state.bombs[id]);
   }
   // update each player sprite
   for (var id in localGame.players) {
     if (sprites[id]) {
-      sprites[id].rotation = degToRad(localGame.players[id].angle);
+      sprites[id].rotation = belt.degToRad(localGame.players[id].angle);
       sprites[id].position.x = localGame.players[id].pos.x;
       sprites[id].position.y = localGame.players[id].pos.y;
     } else {
@@ -177,6 +190,12 @@ function onGameState (state) {
       sprites[id].position.y = localGame.bombs[id].pos.y;
     } else {
       addBombSprite(localGame.bombs[id]);
+    }
+  }
+  // remove local players that don't exist anymore
+  for (var id in localGame.players) {
+    if (!state.players[id]) {
+      removePlayerSprite(localGame.players[id]);
     }
   }
   // remove local bombs that don't exist anymore

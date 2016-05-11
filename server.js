@@ -7,8 +7,8 @@ app.use(express.static('.'));
 const server = require('http').Server(app);
 const io = require('socket.io')(server);
 // 1st
-const Player = require('./common').Player;
-const Game = require('./common').Game;
+const Player = require('./common/Player');
+const Game = require('./common/Game');
 
 app.get('/', function (req, res) {
   res.sendFile(__dirname + '/index.html');
@@ -34,7 +34,6 @@ function onClientDisconnect () {
 }
 
 function onClientHandshake (cb) {
-  console.log('client handshake');
   const player = new Player({ id: this.id });
   localGame.addPlayer(player);
   this.emit('PLAYER_JOIN', player);
