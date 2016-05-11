@@ -21,7 +21,16 @@ Dependencies: [Node.js](https://nodejs.org/) + [Socket.io](http://socket.io/)
     git clone git@github.com:danneu/space-arena.git
     cd space-arena
     npm install
-    npm start
+    browserify client.js -o bundle.js
+    npm start-dev
 
 Navigate to <http://localhost:3000>
+
+## Deploy
+
+    git checkout prod
+    git merge master
+    browserify client.js -o bundle.js
+    git commit -am 'Compile'
+    git push heroku prod:master
 
