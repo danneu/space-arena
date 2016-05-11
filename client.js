@@ -116,6 +116,8 @@ function getInfoText () {
   out += '\n moving: ' + Math.floor(player.vel.deg()) + '°';
   out += '\n ----';
   out += '\n energy: ' + player.currEnergy + '/' + player.totalEnergy;
+  out += '\n\n';
+  out += ' Arrows to move, S for bombs, D for bullets'
   return out;
 }
 
