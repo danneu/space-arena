@@ -3,6 +3,7 @@ var Game = require('./common/Game');
 var Player =require('./common/Player'); 
 var Vector = require('./common/Vector');
 var Bomb = require('./common/Bomb');
+var Bullet = require('./common/Bullet');
 var belt = require('./common/belt');
 
 // var SERVER_URL = 'https://hello-world-game.herokuapp.com/';
@@ -32,6 +33,7 @@ document.body.appendChild(renderer.view);
 var world = new PIXI.Container();
 var shipTexture = PIXI.Texture.fromImage('/img/ship.gif');
 var bombTexture = PIXI.Texture.fromImage('/img/bomb.png');
+var bulletTexture = PIXI.Texture.fromImage('/img/bullet.png');
 var wallTexture = PIXI.Texture.fromImage('/img/asteroid16.jpg');
 var starfieldSprite = new PIXI.extras.TilingSprite(PIXI.Texture.fromImage('/img/starfield.jpg'), renderer.width, renderer.height);
 var info = new PIXI.Text('loading...', {
@@ -76,6 +78,16 @@ function addPlayerSprite (player) {
 }
 function addBombSprite (state) {
   var sprite = new PIXI.Sprite(bombTexture);
+  sprite.anchor.x = 0.5;
+  sprite.anchor.y = 0.5;
+  sprite.position.x = state.pos.x;
+  sprite.position.y = state.pos.y;
+  sprites[state.id] = sprite;
+  world.addChild(sprite);
+}
+
+function addBulletSprite (state) {
+  var sprite = new PIXI.Sprite(bulletTexture);
   sprite.anchor.x = 0.5;
   sprite.anchor.y = 0.5;
   sprite.position.x = state.pos.x;
@@ -173,6 +185,13 @@ function onGameState (state) {
     else
       localGame.bombs[id] = new Bomb(state.bombs[id]);
   }
+  // merge in bullet state from server or create them locally
+  for (var id in state.bullets) {
+    if (localGame.bullets[id])
+      localGame.bullets[id].mergeM(state.bullets[id]);
+    else
+      localGame.bullets[id] = new Bullet(state.bullets[id]);
+  }
   // update each player sprite
   for (var id in localGame.players) {
     if (sprites[id]) {
@@ -192,6 +211,15 @@ function onGameState (state) {
       addBombSprite(localGame.bombs[id]);
     }
   }
+  // update each bullet sprite
+  for (var id in localGame.bullets) {
+    if (sprites[id]) {
+      sprites[id].position.x = localGame.bullets[id].pos.x;
+      sprites[id].position.y = localGame.bullets[id].pos.y;
+    } else {
+      addBulletSprite(localGame.bullets[id]);
+    }
+  }
   // remove local players that don't exist anymore
   for (var id in localGame.players) {
     if (!state.players[id]) {
@@ -202,6 +230,12 @@ function onGameState (state) {
   for (var id in localGame.bombs) {
     if (!state.bombs[id]) {
       removeBombSprite(localGame.bombs[id]);
+    }
+  }
+  // remove local bullets that don't exist anymore
+  for (var id in localGame.bullets) {
+    if (!state.bullets[id]) {
+      removeSprite(id);
     }
   }
 }

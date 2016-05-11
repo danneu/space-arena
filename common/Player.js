@@ -21,7 +21,7 @@ function Player (data) {
   this.h = data.h || 64;
   this.acceleration = data.acceleration || 3;
   this.bounciness = data.bounciness || 0.75;
-  this.minBounceVelocity = data.minBounceVelocity || 0.75;
+  this.minBounceVelocity = data.minBounceVelocity || 0.10;
   this.maxSpeed = data.maxSpeed || 3;
   // EXTENSIONS: ENERGY
   this.totalEnergy = 1000;
@@ -35,7 +35,9 @@ function Player (data) {
   this.lastBomb = new Date(0);
   this.bombCooldown = 1000; // ms
   this.bombBounces = 0; // TODO: bounces left. 0 = doesn't bounce.
-  // TODO: EXTENSIONS: BULLETS
+  // EXTENSIONS: BULLETS
+  this.lastBullet = new Date(0);
+  this.bulletCooldown = 50; //ms
 }
 
 Player.prototype = _.create(Entity.prototype, {

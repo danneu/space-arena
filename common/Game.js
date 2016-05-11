@@ -6,6 +6,7 @@ var Entity = require('./Entity');
 var Vector = require('./Vector');
 var Player = require('./Player');
 var Bomb = require('./Bomb');
+var Bullet = require('./Bullet');
 var Level = require('./Level');
 var belt = require('./belt');
 
@@ -19,6 +20,7 @@ function Game (data) {
   this.h = this.level.h;
   this.players = data.players || Object.create(null);
   this.bombs = data.bombs || Object.create(null);
+  this.bullets = data.bullets || Object.create(null);
   // each player's velocity is multiplied by the friction scalar
   // in every frame.
   this.airFriction = 0.995;
@@ -84,7 +86,7 @@ Game.prototype.step = function (tick) {
       player.vel.multiplyM(this.airFriction);
     }
     // HANDLE BOMB INPUT
-    if (player.keys.S && new Date() - player.lastBomb >= player.bombCooldown && player.currEnergy >= player.bombCost) {
+    if (player.keys.D && new Date() - player.lastBomb >= player.bombCooldown && player.currEnergy >= player.bombCost) {
       var bomb = new Bomb({
         playerId: player.id,
         pos: player.nose(),
@@ -95,6 +97,19 @@ Game.prototype.step = function (tick) {
       player.currEnergy -= player.bombCost;
       // reset bomb cooldown
       player.lastBomb = new Date();
+    }
+    // HANDLE BULLET INPUT
+    if (player.keys.S && new Date() - player.lastBullet >= player.bulletCooldown && player.currEnergy >= player.bulletCost) {
+      var bullet = new Bullet({
+        playerId: player.id,
+        pos: player.nose(),
+        vel: Vector.fromDeg(player.angle).multiplyM(3).addM(player.vel.multiply(0.5))
+      });
+      this.bullets[bullet.id] = bullet;
+      // spend the energy
+      player.currEnergy -= player.bulletCost;
+      // reset bomb cooldown
+      player.lastBullet = new Date();
     }
     // RECHARGE ENERGY
     player.currEnergy = Math.min(player.totalEnergy, Math.round(player.currEnergy + player.rechargeRate * tick));
@@ -113,7 +128,22 @@ Game.prototype.step = function (tick) {
     bomb.handleMovementTrace(result);
     bomb.currFlightTime += tick;
   }
+  // MOVE EACH BULLET
+  for (var id in this.bullets) {
+    var bullet = this.bullets[id];
+    // see if bomb has hit its flying limit
+    if (bullet.currFlightTime > bullet.maxFlightTime) {
+      delete this.bullets[bullet.id];
+    }
+    // World collision check
+    //var mx = bomb.vel.x * tick;
+    //var my = bomb.vel.y * tick;
+    var result = bullet.traceCollision(this.level.collisionMap);
+    bullet.handleMovementTrace(result);
+    bullet.currFlightTime += tick;
+  }
   // TODO: CHECK BOMB<->PLAYER COLLISIONS
+  // TODO: CHECK BULLET<->PLAYER COLLISIONS
 };
 
 Game.prototype.physicsLoop = function () {
