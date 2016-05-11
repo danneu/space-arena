@@ -16,6 +16,8 @@ if (window.location.hostname === 'localhost') {
 
 // client.js
 
+var pingResult; // set by beginPingLoop, undefined | Int (milliseconds)
+
 var localGame = new Game();
 var localPlayerId;
 
@@ -107,7 +109,8 @@ function getInfoText () {
   if (!localPlayerId) return '';
   var player = localGame.players[localPlayerId];
   var out = '';
-  out += ' speed: ' + player.vel.length().toFixed(2);
+  out += ' ping: ' + (typeof pingResult === 'undefined' ? '--' : pingResult + ' ms');
+  out += '\n speed: ' + player.vel.length().toFixed(2);
   out += '\n nose : (' + player.nose().x.toFixed(2) + ', ' + player.nose().y.toFixed(2) + ')';
   out += '\n posit: (' + player.pos.x.toFixed(2) + ', ' + player.pos.y.toFixed(2) + ')';
   out += '\n accel: (' + player.acc.x.toFixed(2) + ', ' + player.acc.y.toFixed(2) + ')';
@@ -235,7 +238,7 @@ function onHandshake (id) {
   console.log('[onHandshake] id:', id);
   localPlayerId = id;
   console.log('initialized as localPlayer', localGame.getPlayer(localPlayerId));
-  //beginPingLoop();
+  beginPingLoop();
 }
 
 var keyToCode = {
@@ -268,10 +271,10 @@ function beginPingLoop () {
     if (new Date() - lastPing < 1000) return;
     var start = Date.now();
     socket.emit('PING', function () {
-      var diff = Date.now() - start;
+      pingResult = Date.now() - start;
       lastPing = new Date();
-      console.log('Ping: ' + diff + 'ms');
     });
   }
   setInterval(ping, 1000);
 }
+
