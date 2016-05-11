@@ -1,4 +1,7 @@
 
+// Taken from ImpactJS
+// TODO: Ask permission or replace with my own logic
+
 var Map = require('./Map');
 
 var H = 1/2;
