@@ -287,17 +287,6 @@ Game.prototype.removePlayer = function (id) {
   return player;
 };
 
-// parameters like player turnSpeed and moveSpeed are
-// measured in the amount a player will turn/move in 1 second.
-//
-// this function adjusts the value against the fraction of
-// the second since the last physics loop.
-function makeAdjust (deltaMs) {
-  return function adjust (val) {
-    return val * deltaMs / 1000;
-  }
-}
-
 function degToVector (deg) {
   var rad = degToRad(deg);
   return new Vector(Math.sin(rad), -Math.cos(rad));
@@ -305,13 +294,12 @@ function degToVector (deg) {
 
 // Simulate a game tick.
 Game.prototype.step = function (deltaMs) {
-  var adjust = makeAdjust(deltaMs);
   // Move players
   for (var id in this.players) {
     var player = this.players[id];
     // Handle turning input
     if (player.keys.LEFT || player.keys.RIGHT) {
-      var deltaAngle = adjust(player.turnSpeed);
+      var deltaAngle = player.turnSpeed * deltaMs / 1000;
       if (player.keys.LEFT) player.angle = mod(player.angle - deltaAngle, 360);
       if (player.keys.RIGHT) player.angle = mod(player.angle + deltaAngle, 360);
     }
