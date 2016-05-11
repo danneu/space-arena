@@ -159,11 +159,6 @@ var level = new Level({
 
 // ENTITIES
 
-function left (e) { return e.pos.x; };
-function right (e) { return e.pos.x + e.w; };
-function top (e) { return e.pos.y; };
-function bottom (e) { return e.pos.y + e.h; };
-
 function Entity (data) {
   data = data = {};
   data.pos = data.pos || {};
@@ -175,6 +170,22 @@ function Entity (data) {
   this.w = data.w || 16;
   this.h = data.h || 16;
 }
+
+Entity.prototype.left = function () {
+  return this.pos.x - this.w/2;
+};
+
+Entity.prototype.right = function () {
+  return this.pos.x + this.w/2;
+};
+
+Entity.prototype.top = function () {
+  return this.pos.y - this.h/2;
+};
+
+Entity.prototype.bottom = function () {
+  return this.pos.y + this.h/2;
+};
 
 
 // i.e. length of the entity's velocity vector
@@ -347,9 +358,10 @@ Game.prototype.step = function (deltaMs) {
     var bomb = this.bombs[id];
     // Add velocity to position
     bomb.pos = bomb.pos.add(bomb.vel);
-    // Clamp position to level boundary
-    // TODO: Replace with a bounds check that also resets velocity
-    bomb.pos = bomb.pos.clampX(0, this.w).clampY(0, this.h);
+    // Remove bomb if it's out of rectangular level bounds
+    if (this.outOfBounds(bomb)) {
+      delete this.bombs[bomb.id];
+    }
   }
 };
 
@@ -361,6 +373,14 @@ Game.prototype.physicsLoop = function () {
     prev = Date.now();
   }
   setInterval(_step, self.physicsInterval);
+};
+
+// Entity -> Bool
+Game.prototype.outOfBounds = function (e) {
+  return e.left() < 0 ||
+    e.right() > this.w ||
+    e.top() < 0 ||
+    e.bottom() > this.h;
 };
 
 ////////////////////////////////////////////////////////////

@@ -179,6 +179,12 @@ function onGameState (state) {
       addBombSprite(localGame.bombs[id]);
     }
   }
+  // remove local bombs that don't exist anymore
+  for (var id in localGame.bombs) {
+    if (!state.bombs[id]) {
+      removeBombSprite(localGame.bombs[id]);
+    }
+  }
 }
 
 function onHandshake (id) {
