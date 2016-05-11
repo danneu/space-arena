@@ -257,19 +257,17 @@ var codeToKey = {
 };
 
 document.addEventListener('keydown', function (e) {
-  var key = codeToKey[e.keyCode];
-  if (!key) return;
+  if (!codeToKey[e.keyCode]) return;
   // do nothing if we're already holding it down
-  if (localGame.getPlayer(localPlayerId).keys[key]) return;
-  localGame.getPlayer(localPlayerId).keys[key] = true;
-  socket.emit('KEYDOWN', key);
+  if (localGame.getPlayer(localPlayerId).keys[codeToKey[e.keyCode]]) return;
+  localGame.getPlayer(localPlayerId).keys[codeToKey[e.keyCode]] = true;
+  socket.emit('KEYDOWN', codeToKey[e.keyCode]);
 });
 
 document.addEventListener('keyup', function (e) {
-  var key = codeToKey[e.keyCode];
-  if (!key) return;
-  socket.emit('KEYUP', key);
-  localGame.getPlayer(localPlayerId).keys[key] = false;
+  if (!codeToKey[e.keyCode]) return;
+  socket.emit('KEYUP', codeToKey[e.keyCode]);
+  localGame.getPlayer(localPlayerId).keys[codeToKey[e.keyCode]] = false;
 });
 
 function beginPingLoop () {
@@ -286,13 +284,3 @@ function beginPingLoop () {
   }
   setInterval(ping, 1000);
 }
-
-// Client optimism
-//localGame.physicsLoop();
-
-// draw at 60fps
-//function drawLoop () {
-  //draw(localGame);
-  //requestAnimationFrame(drawLoop);
-//}
-//drawLoop();
