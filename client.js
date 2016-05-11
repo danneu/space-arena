@@ -26,6 +26,7 @@ document.body.appendChild(renderer.view);
 var world = new PIXI.Container();
 var shipTexture = PIXI.Texture.fromImage('/img/ship.gif');
 var bombTexture = PIXI.Texture.fromImage('/img/bomb.png');
+var wallTexture = PIXI.Texture.fromImage('/img/asteroid16.jpg');
 var starfieldSprite = new PIXI.extras.TilingSprite(PIXI.Texture.fromImage('/img/starfield.jpg'), renderer.width, renderer.height);
 var info = new PIXI.Text('loading...', {
   font: '18px monospace',
@@ -35,6 +36,21 @@ var info = new PIXI.Text('loading...', {
 viewport.addChild(starfieldSprite);
 viewport.addChild(info);
 viewport.addChild(world);
+
+// Add walls to world
+for (var rowIdx in localGame.level.raw) {
+  var row = localGame.level.raw[rowIdx];
+  for (var colIdx in row) {
+    var cell = row[colIdx];
+    if (cell === '0') continue;
+    var sprite = new PIXI.Sprite(wallTexture);
+    var x = (rowIdx) * localGame.level.tilesize;
+    var y = (colIdx) * localGame.level.tilesize;
+    sprite.position.set(y, x);
+    world.addChild(sprite);
+  }
+}
+
 
 // our own mapping of playerIds to their underlying PIXI Sprite instance
 // gets updated as players join/leave
@@ -94,8 +110,8 @@ function animate () {
     // info text
     info.text = getInfoText();
     // parallel
-    starfieldSprite.tilePosition.x += -localGame.players[localPlayerId].vel.x;
-    starfieldSprite.tilePosition.y += -localGame.players[localPlayerId].vel.y;
+    starfieldSprite.tilePosition.x += -localPlayer.vel.x/2;
+    starfieldSprite.tilePosition.y += -localPlayer.vel.y/2;
     // center cam
     world.position.x = windowDims.w/2 - localPlayer.pos.x;
     world.position.y = windowDims.h/2 - localPlayer.pos.y;
