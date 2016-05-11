@@ -96,17 +96,6 @@ function addBulletSprite (state) {
   world.addChild(sprite);
 }
 
-function removePlayerSprite (player) {
-  console.log('removing', player);
-  world.removeChild(sprites[player.id]);
-  delete sprites[player.id];
-}
-function removeBombSprite (state) {
-  world.removeChild(sprites[state.id]);
-  delete sprites[state.id];
-}
-
-// TODO: Use this..
 function removeSprite (id) {
   world.removeChild(sprites[id]);
   delete sprites[id];
@@ -167,7 +156,7 @@ function onPlayerJoin (player) {
 
 function onPlayerLeave (player) {
   console.log('PLAYER_LEAVE', player);
-  removePlayerSprite(player);
+  removeSprite(player.id);
 }
 
 function onGameState (state) {
@@ -223,13 +212,13 @@ function onGameState (state) {
   // remove local players that don't exist anymore
   for (var id in localGame.players) {
     if (!state.players[id]) {
-      removePlayerSprite(localGame.players[id]);
+      removeSprite(id);
     }
   }
   // remove local bombs that don't exist anymore
   for (var id in localGame.bombs) {
     if (!state.bombs[id]) {
-      removeBombSprite(localGame.bombs[id]);
+      removeSprite(id);
     }
   }
   // remove local bullets that don't exist anymore
