@@ -9,13 +9,6 @@ var belt = require('./belt');
 function Player (data) {
   data = data || {};
   Entity.call(this, data);
-  // VECTORS
-  this.angle = data.angle || 45;
-  this.keys = {
-    UP: false, DOWN: false, LEFT: false, RIGHT: false
-  };
-  this.turnSpeed = 200; // degs per second
-  this.color = data.color || '#'+(Math.random()*0xFFFFFF<<0).toString(16);
   // OVERRIDES
   this.w = 48;
   this.h = 48;
@@ -23,6 +16,18 @@ function Player (data) {
   this.bounciness = data.bounciness || 0.75;
   this.minBounceVelocity = data.minBounceVelocity || 0.10;
   this.maxSpeed = data.maxSpeed || 3;
+  // EXTENSIONS: MISC
+  this.color = data.color || '#'+(Math.random()*0xFFFFFF<<0).toString(16);
+  // EXTENSIONS: MOVEMENT
+  // - angle is clamped to the nearest 9 degrees (40 possible nose positions)
+  // - angle should be used in all calculations
+  this.angle = data.angle || 45;
+  // - subangle is 0-359 and used to calculate the clamped angle
+  this._subangle = this.angle;
+  this.turnSpeed = 200; // degs per second
+  this.keys = {
+    UP: false, DOWN: false, LEFT: false, RIGHT: false
+  };
   // EXTENSIONS: ENERGY
   this.totalEnergy = 1000;
   this.currEnergy = this.totalEnergy;

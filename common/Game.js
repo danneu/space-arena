@@ -58,8 +58,10 @@ Game.prototype.step = function (tick) {
     // Handle turning input
     if (player.keys.LEFT || player.keys.RIGHT) {
       var deltaAngle = player.turnSpeed * tick;
-      if (player.keys.LEFT) player.angle = belt.mod(player.angle - deltaAngle, 360);
-      if (player.keys.RIGHT) player.angle = belt.mod(player.angle + deltaAngle, 360);
+      if (player.keys.LEFT) player._subangle = belt.mod(player._subangle - deltaAngle, 360);
+      if (player.keys.RIGHT) player._subangle = belt.mod(player._subangle + deltaAngle, 360);
+      // clamp to nearest 9 degrees
+      player.angle = belt.nearestMultiple(player._subangle, 9);
     }
     // Handle acceleration input
     if (player.keys.UP || player.keys.DOWN) {

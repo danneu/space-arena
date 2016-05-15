@@ -22,3 +22,15 @@ exports.uid = (function () {
     return ++id;
   }
 })();
+
+// nearestMulitple(8, 9) => 9
+// nearestMultiple(10, 9) => 9
+// nearestMultiple(15, 9) => 18
+// nearestMultiple(1, 9) => 0
+//
+// (Float, Int) => Int
+exports.nearestMultiple = function (n, mult) {
+  var result = mult * Math.round(n / mult);
+  console.log(n, result);
+  return result;
+};
