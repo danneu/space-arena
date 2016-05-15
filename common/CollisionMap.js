@@ -3,7 +3,10 @@
 // from ImpactJS <http://impactjs.com/>
 // Authored by Dominic Szablewski
 //
-// ctrl-f for "ORIGINAL" to see my patches
+// Note: Impact's entity positions are anchored top-left.
+//       Mine are anchored in their center. I translate into Impact coords
+//       before tracing, but at the callsite so that I don't need to
+//       change this file.
 
 var Map = require('./Map');
 
@@ -95,8 +98,7 @@ CollisionMap.prototype._traceStep = function (result, x, y, vx, vy, width, heigh
   var t = 0;
   // Horizontal collision (walls)
   if (vx) {
-    // ORIGINAL: var pxOffsetX = (vx > 0 ? width : 0);
-    var pxOffsetX = (vx > 0 ? width : (vx < 0 ? -width : 0));
+    var pxOffsetX = (vx > 0 ? width : 0);
     var tileOffsetX = (vx < 0 ? this.tilesize : 0);
     var firstTileY = Math.max(Math.floor(y / this.tilesize), 0);
     var lastTileY = Math.min(Math.ceil((y + height) / this.tilesize), this.height);
@@ -145,8 +147,7 @@ CollisionMap.prototype._traceStep = function (result, x, y, vx, vy, width, heigh
   }
   // Vertical collision (floor, ceiling)
   if (vy) {
-    // ORIGINAL: var pxOffsetY = (vy > 0 ? height : 0);
-    var pxOffsetY = (vy > 0 ? height : (vy < 0 ? -height : 0));
+    var pxOffsetY = (vy > 0 ? height : 0);
     var tileOffsetY = (vy < 0 ? this.tilesize : 0);
     
     var firstTileX = Math.max( Math.floor(result.pos.x / this.tilesize), 0 );

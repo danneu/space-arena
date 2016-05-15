@@ -34,13 +34,19 @@ Entity.prototype.mergeM = function () {
 // returns collisionmap result
 Entity.prototype.traceCollision = function (collisionMap) {
   var result = collisionMap.trace(
-    this.pos.x 
-  , this.pos.y
+    // translate our center-anchored position coords into 
+    // top-left-anchored coords
+    this.pos.x - this.w/2
+  , this.pos.y - this.h/2
   , this.vel.x
   , this.vel.y
-  , this.w/2
-  , this.h/2
+  , this.w
+  , this.h
   );
+  // translate Impact's top-left anchored coords back into 
+  // our center-anchored coords
+  result.pos.x += this.w/2;
+  result.pos.y += this.h/2;
   return result;
 };
 
