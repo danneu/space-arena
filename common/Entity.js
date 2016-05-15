@@ -59,6 +59,8 @@ Entity.prototype.handleMovementTrace = function (result) {
     } else {
       this.vel.y = 0;
     }
+    // friction
+    this.vel.x *= 0.9;
   }
   if (result.collision.x) {
     if (this.bounciness > 0 && Math.abs(this.vel.x) > this.minBounceVelocity) {
@@ -66,6 +68,8 @@ Entity.prototype.handleMovementTrace = function (result) {
     } else {
       this.vel.x = 0;
     }
+    // friction
+    this.vel.y *= 0.9;
   }
   this.pos.mergeM(result.pos);
 };
