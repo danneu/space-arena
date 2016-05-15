@@ -30,7 +30,5 @@ exports.uid = (function () {
 //
 // (Float, Int) => Int
 exports.nearestMultiple = function (n, mult) {
-  var result = mult * Math.round(n / mult);
-  console.log(n, result);
-  return result;
+  return mult * Math.round(n / mult);
 };
