@@ -70,30 +70,24 @@ var sprites = Object.create(null);
 // global `sprites` map, and adds it to the stage
 function addPlayerSprite (player) {
   var sprite = new PIXI.Sprite(shipTexture);
-  sprite.anchor.x = 0.5;
-  sprite.anchor.y = 0.5;
-  sprite.position.x = player.pos.x;
-  sprite.position.y = player.pos.y;
+  sprite.anchor.set(0.5, 0.5);
+  sprite.position.set(player.pos.x, player.pos.y);
   sprite.rotation = belt.degToRad(player.angle);
   sprites[player.id] = sprite;
   world.addChild(sprite);
 }
 function addBombSprite (state) {
   var sprite = new PIXI.Sprite(bombTexture);
-  sprite.anchor.x = 0.5;
-  sprite.anchor.y = 0.5;
-  sprite.position.x = state.pos.x;
-  sprite.position.y = state.pos.y;
+  sprite.anchor.set(0.5, 0.5);
+  sprite.position.set(state.pos.x, state.pos.y);
   sprites[state.id] = sprite;
   world.addChild(sprite);
 }
 
 function addBulletSprite (state) {
   var sprite = new PIXI.Sprite(bulletTexture);
-  sprite.anchor.x = 0.5;
-  sprite.anchor.y = 0.5;
-  sprite.position.x = state.pos.x;
-  sprite.position.y = state.pos.y;
+  sprite.anchor.set(0.5, 0.5);
+  sprite.position.set(state.pos.x, state.pos.y);
   sprites[state.id] = sprite;
   world.addChild(sprite);
 }
