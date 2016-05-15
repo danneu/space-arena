@@ -11,8 +11,9 @@ function Bullet (data) {
   Entity.call(this, data);
   this.playerId = data.playerId;
   // OVERRIDES
-  this.w = 7;
-  this.h = 6;
+  // - Hitbox is smaller than sprite
+  this.w = 2; // actual = 7
+  this.h = 2; // actual = 6
   this.bounciness = 1.0; // no friction
   // EXTENSIONS
   this.maxFlightTime = 1.0; // in seconds

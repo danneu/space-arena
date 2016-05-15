@@ -11,8 +11,9 @@ function Bomb (data) {
   Entity.call(this, data);
   this.playerId = data.playerId;
   // OVERRIDES
-  this.w = 18;
-  this.h = 18;
+  // - Hitbox is smaller than sprite
+  this.w = 2; // actual = 18
+  this.h = 2; // actual = 18
   this.bounciness = 1.0; // no friction
   // EXTENSIONS
   this.maxFlightTime = 3.0; // in seconds
