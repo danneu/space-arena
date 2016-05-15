@@ -1,6 +1,9 @@
 
-// Taken from ImpactJS
-// TODO: Ask permission or replace with my own logic
+// CollisionMap implementation taken with permission 
+// from ImpactJS <http://impactjs.com/>
+// Authored by Dominic Szablewski
+//
+// ctrl-f for "ORIGINAL" to see my patches
 
 var Map = require('./Map');
 
@@ -92,7 +95,8 @@ CollisionMap.prototype._traceStep = function (result, x, y, vx, vy, width, heigh
   var t = 0;
   // Horizontal collision (walls)
   if (vx) {
-    var pxOffsetX = (vx > 0 ? width : 0);
+    // ORIGINAL: var pxOffsetX = (vx > 0 ? width : 0);
+    var pxOffsetX = (vx > 0 ? width : (vx < 0 ? -width : 0));
     var tileOffsetX = (vx < 0 ? this.tilesize : 0);
     var firstTileY = Math.max(Math.floor(y / this.tilesize), 0);
     var lastTileY = Math.min(Math.ceil((y + height) / this.tilesize), this.height);
@@ -141,7 +145,8 @@ CollisionMap.prototype._traceStep = function (result, x, y, vx, vy, width, heigh
   }
   // Vertical collision (floor, ceiling)
   if (vy) {
-    var pxOffsetY = (vy > 0 ? height : 0);
+    // ORIGINAL: var pxOffsetY = (vy > 0 ? height : 0);
+    var pxOffsetY = (vy > 0 ? height : (vy < 0 ? -height : 0));
     var tileOffsetY = (vy < 0 ? this.tilesize : 0);
     
     var firstTileX = Math.max( Math.floor(result.pos.x / this.tilesize), 0 );
