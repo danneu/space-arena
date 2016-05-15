@@ -17,8 +17,8 @@ function Player (data) {
   this.turnSpeed = 200; // degs per second
   this.color = data.color || '#'+(Math.random()*0xFFFFFF<<0).toString(16);
   // OVERRIDES
-  this.w = data.w || 64;
-  this.h = data.h || 64;
+  this.w = 48;
+  this.h = 48;
   this.acceleration = data.acceleration || 3;
   this.bounciness = data.bounciness || 0.75;
   this.minBounceVelocity = data.minBounceVelocity || 0.10;

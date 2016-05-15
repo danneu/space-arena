@@ -13,8 +13,8 @@ function Entity (data) {
   this.vel = new Vector(data.vel.x || 1, data.vel.y || 0);
   this.acc = new Vector(data.acc.x || 0, data.acc.y || 0);
   // SIZE
-  this.w = data.w || 16;
-  this.h = data.h || 16;
+  this.w = data.w;
+  this.h = data.h;
   // PARAMS
   this.acceleration = 0;
   this.bounciness = 0;
@@ -33,7 +33,14 @@ Entity.prototype.mergeM = function () {
 
 // returns collisionmap result
 Entity.prototype.traceCollision = function (collisionMap) {
-  var result = collisionMap.trace(this.pos.x, this.pos.y, this.vel.x, this.vel.y, this.w, this.h);
+  var result = collisionMap.trace(
+    this.pos.x 
+  , this.pos.y
+  , this.vel.x
+  , this.vel.y
+  , this.w/2
+  , this.h/2
+  );
   return result;
 };
 

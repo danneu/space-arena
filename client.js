@@ -33,7 +33,7 @@ console.log('renderer:', renderer);
 document.body.appendChild(renderer.view);
 
 var world = new PIXI.Container();
-var shipTexture = PIXI.Texture.fromImage('/img/ship.gif');
+var shipTexture = PIXI.Texture.fromImage('/img/ship48.gif');
 var bombTexture = PIXI.Texture.fromImage('/img/bomb.png');
 var bulletTexture = PIXI.Texture.fromImage('/img/bullet.png');
 var wallTexture = PIXI.Texture.fromImage('/img/asteroid16.jpg');
@@ -54,9 +54,9 @@ for (var rowIdx in localGame.level.raw) {
     var cell = row[colIdx];
     if (cell === '0') continue;
     var sprite = new PIXI.Sprite(wallTexture);
-    var x = (rowIdx) * localGame.level.tilesize;
-    var y = (colIdx) * localGame.level.tilesize;
-    sprite.position.set(y, x);
+    var x = (colIdx) * localGame.level.tilesize;
+    var y = (rowIdx) * localGame.level.tilesize;
+    sprite.position.set(x, y);
     world.addChild(sprite);
   }
 }
