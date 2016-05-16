@@ -11,7 +11,7 @@ function Player (data) {
   Entity.call(this, data);
   // OVERRIDES
   this.w = 30;
-  this.h = 29;
+  this.h = 30;
   this.thrust = data.thrust || 3;
   this.bounciness = data.bounciness || 0.75;
   this.minBounceVelocity = data.minBounceVelocity || 0.10;
