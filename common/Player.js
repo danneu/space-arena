@@ -10,9 +10,9 @@ function Player (data) {
   data = data || {};
   Entity.call(this, data);
   // OVERRIDES
-  this.w = 48;
-  this.h = 48;
   this.acceleration = data.acceleration || 3;
+  this.w = 30;
+  this.h = 29;
   this.bounciness = data.bounciness || 0.75;
   this.minBounceVelocity = data.minBounceVelocity || 0.10;
   this.maxSpeed = data.maxSpeed || 3;

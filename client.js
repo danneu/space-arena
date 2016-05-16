@@ -33,7 +33,7 @@ console.log('renderer:', renderer);
 document.body.appendChild(renderer.view);
 
 var world = new PIXI.Container();
-var shipTexture = PIXI.Texture.fromImage('/img/ship48.gif');
+var shipTexture = PIXI.Texture.fromImage('/img/warbird.gif');
 var bombTexture = PIXI.Texture.fromImage('/img/bomb.png');
 var bulletTexture = PIXI.Texture.fromImage('/img/bullet.png');
 var wallTexture = PIXI.Texture.fromImage('/img/asteroid16.jpg');
