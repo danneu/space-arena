@@ -55,7 +55,9 @@ Player.prototype.toJson = function () {
     vel: this.vel,
     w: this.w,
     h: this.h,
-    angle: this.angle
+    angle: this.angle,
+    currEnergy: this.currEnergy
+
   };
 };
 
