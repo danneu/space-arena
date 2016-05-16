@@ -26,11 +26,19 @@ Bomb.prototype = _.create(Entity.prototype, {
   constructor: Bomb
 });
 
+Bomb.prototype.toJson = function () {
+  return {
+    id: this.id,
+    playerId: this.playerId,
+    pos: this.pos
+  };
+};
+
 // merge in state broadcast from the server
 // only the stuff that changes between frames
 Bomb.prototype.mergeM = function (state) {
   this.pos.mergeM(state.pos);
-  this.vel.mergeM(state.vel);
+  if (state.vel) this.vel.mergeM(state.vel);
   return this;
 };
 

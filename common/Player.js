@@ -50,6 +50,7 @@ Player.prototype = _.create(Entity.prototype, {
 // really, to JSON object
 Player.prototype.toJson = function () {
   return {
+    id: this.id,
     pos: this.pos,
     vel: this.vel,
     w: this.w,

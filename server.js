@@ -76,8 +76,8 @@ localGame.physicsLoop();
 setInterval(function () {
   // just emit the essential data
   io.emit('GAME_STATE', {
-    players: _.mapValues(localGame.players, p => p.toJson()),
-    bombs: localGame.bombs,
-    bullets: localGame.bullets
+    players: _.mapValues(localGame.players, x => x.toJson()),
+    bombs: _.mapValues(localGame.bombs, x => x.toJson()),
+    bullets: _.mapValues(localGame.bullets, x => x.toJson())
   });
 }, localGame.broadcastInterval);
