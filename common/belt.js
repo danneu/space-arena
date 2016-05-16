@@ -32,3 +32,7 @@ exports.uid = (function () {
 exports.nearestMultiple = function (n, mult) {
   return mult * Math.round(n / mult);
 };
+
+exports.randomNth = function (xs) {
+  return xs[Math.floor(Math.random() * xs.length)];
+};

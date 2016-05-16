@@ -23,7 +23,6 @@ var localPlayerId;
 
 var windowDims = { w: window.innerWidth, h: window.innerHeight };
 
-
 // SETUP PIXI
 
 var viewport = new PIXI.Container();
@@ -33,7 +32,11 @@ console.log('renderer:', renderer);
 document.body.appendChild(renderer.view);
 
 var world = new PIXI.Container();
-var shipTexture = PIXI.Texture.fromImage('/img/warbird.gif');
+var shipTextures = [
+  PIXI.Texture.fromImage('/img/warbird.gif'),
+  PIXI.Texture.fromImage('/img/javelin.gif'),
+  PIXI.Texture.fromImage('/img/spider.gif'),
+];
 var bombTexture = PIXI.Texture.fromImage('/img/bomb.png');
 var bulletTexture = PIXI.Texture.fromImage('/img/bullet.png');
 var wallTexture = PIXI.Texture.fromImage('/img/asteroid16.jpg');
@@ -69,7 +72,7 @@ var sprites = Object.create(null);
 // creates a sprite from a player, adds it to the
 // global `sprites` map, and adds it to the stage
 function addPlayerSprite (player) {
-  var sprite = new PIXI.Sprite(shipTexture);
+  var sprite = new PIXI.Sprite(belt.randomNth(shipTextures));
   sprite.anchor.set(0.5, 0.5);
   sprite.position.set(player.pos.x, player.pos.y);
   sprite.rotation = belt.degToRad(player.angle);
