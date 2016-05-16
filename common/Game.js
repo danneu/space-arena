@@ -25,8 +25,8 @@ function Game (data) {
   // in every frame.
   this.airFriction = 0.995;
   // loops
-  this.physicsInterval = data.physicsInterval || 15; // 66 times per sec
-  this.broadcastInterval = data.broadCastInterval || 45; // 22 times per sec
+  this.physicsInterval = data.physicsInterval || 15;
+  this.broadcastInterval = data.broadCastInterval || 45;
 }
 
 // TODO: implemented in client.js and reuse there
@@ -67,7 +67,7 @@ Game.prototype.step = function (tick) {
     if (player.keys.UP || player.keys.DOWN) {
       var newVector = Vector.fromDeg(player.angle);
       if (player.keys.DOWN) newVector.multiplyM(-1);
-      newVector.multiplyM(player.acceleration);
+      newVector.multiplyM(player.thrust);
       player.acc = newVector;
     } else {
       // no keys pressed = no acceleration
