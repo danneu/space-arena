@@ -16,8 +16,6 @@ function Player (data) {
   this.bounciness = data.bounciness || 0.75;
   this.minBounceVelocity = data.minBounceVelocity || 0.10;
   this.maxSpeed = data.maxSpeed || 3;
-  // EXTENSIONS: MISC
-  this.color = data.color || '#'+(Math.random()*0xFFFFFF<<0).toString(16);
   // EXTENSIONS: MOVEMENT
   // - angle is clamped to the nearest 9 degrees (40 possible nose positions)
   // - angle should be used in all calculations
@@ -49,15 +47,26 @@ Player.prototype = _.create(Entity.prototype, {
   constructor: Player
 });
 
+// really, to JSON object
+Player.prototype.toJson = function () {
+  return {
+    pos: this.pos,
+    vel: this.vel,
+    w: this.w,
+    h: this.h,
+    angle: this.angle
+  };
+};
+
 // merge in state broadcast from the server
 // only the stuff that changes between frames
 Player.prototype.mergeM = function (state) {
   this.pos.mergeM(state.pos);
-  this.vel.mergeM(state.vel);
-  this.acc.mergeM(state.acc);
   this.angle = state.angle;
-  this.keys = state.keys;
-  this.currEnergy = state.currEnergy;
+  if (state.vel) this.vel.mergeM(state.vel);
+  if (state.acc) this.acc.mergeM(state.acc);
+  if (state.keys) this.keys = state.keys;
+  if (state.currEnergy) this.currEnergy = state.currEnergy;
   return this;
 };
 

@@ -6,6 +6,7 @@ const app = express();
 app.use(express.static('.'));
 const server = require('http').Server(app);
 const io = require('socket.io')(server);
+const _ = require('lodash');
 // 1st
 const Player = require('./common/Player');
 const Game = require('./common/Game');
@@ -75,7 +76,7 @@ localGame.physicsLoop();
 setInterval(function () {
   // just emit the essential data
   io.emit('GAME_STATE', {
-    players: localGame.players,
+    players: _.mapValues(localGame.players, p => p.toJson()),
     bombs: localGame.bombs,
     bullets: localGame.bullets
   });
